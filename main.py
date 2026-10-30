@@ -40,7 +40,7 @@ async def start_cmd(message: types.Message):
 
 @app.on_event("startup")
 async def on_startup():
-    asyncio.createTask(dp.start_polling(bot))
+    asyncio.create_task(dp.start_polling(bot))
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
