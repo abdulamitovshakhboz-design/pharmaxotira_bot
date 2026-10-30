@@ -30,19 +30,20 @@
     }
     .header h1 {
       font-size: 1.3rem;
-      margin: 0;
+      margin: 0 0 10px 0;
       color: #2c3e50;
     }
-    .cluster-select {
+    .search-input, .cluster-select {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
+      margin-top: 8px;
       border-radius: 10px;
       border: 1px solid #cbd5e1;
       background: white;
       font-weight: bold;
       color: #334155;
       font-size: 0.85rem;
+      box-sizing: border-box;
     }
     .card-container {
       width: 100%;
@@ -51,7 +52,6 @@
     }
     .card {
       width: 100%;
-      min-height: 380px;
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -70,7 +70,7 @@
     .badge {
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: bold;
       color: #fff;
       background-color: var(--primary-color);
@@ -80,38 +80,42 @@
       font-weight: bold;
       color: #64748b;
     }
-    .icon-box {
-      font-size: 3rem;
-      text-align: center;
-      margin: 5px 0;
-    }
     .drug-title {
       text-align: center;
       font-size: 1.25rem;
       font-weight: bold;
-      margin: 5px 0;
+      margin: 5px 0 2px 0;
+      color: #1e293b;
     }
     .drug-latin {
       text-align: center;
       font-style: italic;
-      color: #7f8c8d;
-      font-size: 0.85rem;
+      color: #64748b;
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+    .drug-category {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #3498db;
       margin-bottom: 12px;
     }
     .info-section {
       font-size: 0.82rem;
       line-height: 1.4;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
     .info-title {
       font-weight: bold;
-      color: #34495e;
+      color: #1e293b;
+      margin-bottom: 2px;
     }
     .mnemonic-box {
-      background-color: #e8f8f5;
-      border-left: 4px solid #1abc9c;
-      padding: 8px 12px;
-      border-radius: 4px;
+      background-color: #f8fafc;
+      border-left: 4px solid #3498db;
+      padding: 10px;
+      border-radius: 6px;
       font-size: 0.82rem;
       margin-top: 10px;
     }
@@ -120,6 +124,7 @@
       gap: 10px;
       width: 100%;
       max-width: 380px;
+      margin-bottom: 20px;
     }
     .btn {
       flex: 1;
@@ -157,7 +162,10 @@
 
   <div class="header">
     <h1>PharmaXotira</h1>
-    <select id="clusterSelect" class="cluster-select" onchange="filterCluster()">
+    <!-- Qidiruv maydoni qo'shildi -->
+    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Dori nomini yozib qidiring..." oninput="filterDrugs()">
+    
+    <select id="clusterSelect" class="cluster-select" onchange="filterDrugs()">
       <option value="ALL">Barcha bo'limlar (Hammasi)</option>
     </select>
   </div>
@@ -227,21 +235,39 @@
       });
     }
 
-    function filterCluster() {
-      const selected = document.getElementById('clusterSelect').value;
-      if (selected === 'ALL') {
-        filteredDrugs = [...allDrugs];
-      } else {
-        filteredDrugs = allDrugs.filter(d => d.cluster === selected);
-      }
+    function filterDrugs() {
+      const selectedCluster = document.getElementById('clusterSelect').value;
+      const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      filteredDrugs = allDrugs.filter(drug => {
+        const matchesCluster = (selectedCluster === 'ALL' || drug.cluster === selectedCluster);
+        const matchesSearch = (
+          (drug.name && drug.name.toLowerCase().includes(searchText)) ||
+          (drug.latin_name && drug.latin_name.toLowerCase().includes(searchText)) ||
+          (drug.mnemonic && drug.mnemonic.toLowerCase().includes(searchText))
+        );
+        return matchesCluster && matchesSearch;
+      });
+
       currentIndex = 0;
       renderCard();
     }
 
     function renderCard() {
-      if (!filteredDrugs.length) return;
-      const drug = filteredDrugs[currentIndex];
       const container = document.getElementById('cardContainer');
+      
+      if (!filteredDrugs.length) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; padding: 40px 20px;">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">🔍</div>
+            <div style="font-weight: bold; color: #64748b;">Dori topilmadi</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 5px;">Boshqa so'z bilan qidirib ko'ring</div>
+          </div>
+        `;
+        return;
+      }
+
+      const drug = filteredDrugs[currentIndex];
 
       container.innerHTML = `
         <div class="card">
@@ -250,17 +276,42 @@
               <span class="badge">${drug.cluster || ''}</span>
               <span class="counter">${currentIndex + 1} / ${filteredDrugs.length}</span>
             </div>
-            <div class="icon-box">${drug.icon || '💊'}</div>
-            <div class="drug-title">${drug.name || ''}</div>
+            
+            <div class="drug-title">${drug.icon || '💊'} ${drug.name || ''}</div>
             <div class="drug-latin">${drug.latin_name || ''}</div>
+            <div class="drug-category">🏷️ ${drug.cluster ? drug.cluster.split(':')[1] || drug.cluster : ''}</div>
             
-            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form || ''}</div>
-            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage || ''}</div>
-            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism || ''}</div>
-            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications || ''}</div>
-            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects || ''}</div>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+
+            <div class="info-section">
+              <div class="info-title">1. Dori shakllari</div>
+              <div>${drug.form || ''}</div>
+            </div>
+
+            <div class="info-section">
+              <div class="info-title">2. Qo‘llash usuli va dozalari</div>
+              <div>${drug.dosage || ''}</div>
+            </div>
+
+            <div class="info-section">
+              <div class="info-title">3. Ta'sir mexanizmi</div>
+              <div>${drug.mechanism || ''}</div>
+            </div>
+
+            <div class="info-section">
+              <div class="info-title">4. Qo‘llanilishi</div>
+              <div>${drug.indications || ''}</div>
+            </div>
+
+            <div class="info-section">
+              <div class="info-title">5. Nojo‘ya ta'sirlari</div>
+              <div>${drug.side_effects || ''}</div>
+            </div>
             
-            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic || ''}</div>
+            <div class="mnemonic-box">
+              <div class="info-title" style="margin-bottom: 3px;">6. Eslab qolish uchun</div>
+              💡 <b>${drug.mnemonic || ''}</b>
+            </div>
           </div>
         </div>
       `;
