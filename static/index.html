@@ -139,6 +139,7 @@
       max-width: 90%;
       max-height: 80%;
       border-radius: 12px;
+      object-fit: contain;
     }
   </style>
 </head>
@@ -181,24 +182,29 @@
       const drug = drugs[currentIndex];
       const container = document.getElementById('cardContainer');
 
+      // JSON faylingizdagi turli nomlarga moslashuvchan mantiq:
+      const tradeName = drug.name_trade || drug.name || drug.id;
+      const latinName = drug.name_latin || drug.latin || '';
+      const innText = drug.inn ? ` (${drug.inn})` : '';
+
       container.innerHTML = `
         <div class="card">
           <div>
-            <div class="badge ${drug.badge_type || 'primary'}">${drug.cluster}</div>
-            <div class="icon-box">${drug.icon}</div>
-            <div class="drug-title">${drug.name_trade}</div>
-            <div class="drug-latin">${drug.name_latin} (${drug.inn})</div>
+            <div class="badge ${drug.badge_type || 'primary'}">${drug.cluster || ''}</div>
+            <div class="icon-box">${drug.icon || '💊'}</div>
+            <div class="drug-title">${tradeName}</div>
+            <div class="drug-latin">${latinName}${innText}</div>
             
-            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form}</div>
-            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage}</div>
-            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism}</div>
-            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications}</div>
-            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects}</div>
+            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form || ''}</div>
+            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage || ''}</div>
+            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism || ''}</div>
+            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications || ''}</div>
+            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects || ''}</div>
             
-            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic}</div>
+            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic || ''}</div>
           </div>
 
-          <button class="btn btn-secondary" style="margin-top: 15px;" onclick="openModal('${drug.real_image_url}')">
+          <button class="btn btn-secondary" style="margin-top: 15px;" onclick="openModal('${drug.real_image_url || drug.image_url || ''}')">
             📸 Real o'ram fotosini ko'rish
           </button>
         </div>
@@ -220,7 +226,14 @@
     }
 
     function openModal(url) {
-      document.getElementById('modalImg').src = url;
+      const img = document.getElementById('modalImg');
+      
+      // Rasm yuklanmay qolsa placeholder rasm ko'rsatadi
+      img.onerror = function() {
+        this.src = 'https://via.placeholder.com/350x250?text=Karobka+Fotosi+Mavjud+Emas';
+      };
+
+      img.src = url && url.startsWith('http') ? url : 'https://via.placeholder.com/350x250?text=Karobka+Fotosi+Mavjud+Emas';
       document.getElementById('imageModal').style.display = 'flex';
     }
 
