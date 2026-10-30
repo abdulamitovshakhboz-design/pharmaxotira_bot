@@ -15,7 +15,7 @@ DRUGS_FILE = "drugs_database.json"
 
 # Render Environment Variables bo'limidan avtomatik o'qiydi
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-CHANNEL_USERNAME = "@fundamedical_academy"
+CHANNELS = ["@fundamedical_academy", "@MedLife_Official"]
 WEB_APP_URL = os.getenv("WEB_APP_URL", os.getenv("WEBAPP_URL", "https://pharmaxotira-bot.onrender.com"))
 
 bot = Bot(token=BOT_TOKEN) if BOT_TOKEN else None
@@ -59,7 +59,6 @@ dp.include_router(router)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if bot:
-        # Eski kutilayotgan xabarlarni tozalab, pollingni boshlaymiz
         await bot.delete_webhook(drop_pending_updates=True)
         asyncio.create_task(dp.start_polling(bot))
     yield
@@ -97,17 +96,23 @@ async def check_subscription(user_id: int = Query(...)):
     if not BOT_TOKEN:
         return {"subscribed": True}
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
-    params = {"chat_id": CHANNEL_USERNAME, "user_id": user_id}
-
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(url, params=params)
-            res_data = response.json()
-            if res_data.get("ok"):
-                status = res_data.get("result", {}).get("status", "")
-                if status in ["member", "administrator", "creator"]:
-                    return {"subscribed": True}
+            for channel in CHANNELS:
+                url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
+                params = {"chat_id": channel, "user_id": user_id}
+                
+                response = await client.get(url, params=params)
+                res_data = response.json()
+                
+                if res_data.get("ok"):
+                    status = res_data.get("result", {}).get("status", "")
+                    if status not in ["member", "administrator", "creator"]:
+                        return {"subscribed": False, "channel": channel}
+                else:
+                    return {"subscribed": False, "channel": channel}
+                    
+        return {"subscribed": True}
     except Exception as e:
         print(f"Obunani tekshirishda xatolik: {e}")
 
