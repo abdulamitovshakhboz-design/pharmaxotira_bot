@@ -13,13 +13,12 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 DRUGS_FILE = "drugs_database.json"
 
-# === BOT SOZLAMALARI ===
-BOT_TOKEN = "9133605157:AAHfFAIxKGcezUawUqecLT2P8fr5zxsmkkE"
+# Render Environment Variables bo'limidan avtomatik o'qiydi
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHANNEL_USERNAME = "@fundamedical_academy"
-WEB_APP_URL = "https://pharmaxotira-bot.onrender.com"
+WEB_APP_URL = os.getenv("WEB_APP_URL", os.getenv("WEBAPP_URL", "https://pharmaxotira-bot.onrender.com"))
 
-# --- AIOGRAM BOT SOZLAMALARI ---
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=BOT_TOKEN) if BOT_TOKEN else None
 dp = Dispatcher()
 router = Router()
 
@@ -57,10 +56,11 @@ async def start_handler(message: types.Message):
 
 dp.include_router(router)
 
-# --- FASTAPI LIFESPAN (Bot pollingni fonda ishga tushirish) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if bot:
+        # Eski kutilayotgan xabarlarni tozalab, pollingni boshlaymiz
+        await bot.delete_webhook(drop_pending_updates=True)
         asyncio.create_task(dp.start_polling(bot))
     yield
     if bot:
