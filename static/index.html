@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PharmaXotira Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #2c3e50;
+      --primary-color: #3498db;
+      --accent-color: #e74c3c;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+      color: #2c3e50;
+    }
+    .header p {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+    .card-container {
+      width: 100%;
+      max-width: 380px;
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+    .card {
+      width: 100%;
+      min-height: 420px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+    .badge {
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    .badge.danger { background-color: #e74c3c; }
+    .badge.warning { background-color: #f39c12; }
+    .badge.success { background-color: #2ecc71; }
+
+    .icon-box {
+      font-size: 4rem;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .drug-title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .drug-latin {
+      text-align: center;
+      font-style: italic;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    .info-section {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .info-title {
+      font-weight: bold;
+      color: #34495e;
+    }
+    .mnemonic-box {
+      background-color: #e8f8f5;
+      border-left: 4px solid #1abc9c;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-primary { background-color: #3498db; color: white; }
+    .btn-secondary { background-color: #ecf0f1; color: #2c3e50; }
+
+    /* Modal Image CSS */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>PharmaXotira</h1>
+    <p>Interaktiv Farmakologiya Flashcardlari</p>
+  </div>
+
+  <div class="card-container" id="cardContainer">
+    <!-- Dynamic Content -->
+  </div>
+
+  <div class="btn-group" style="width: 100%; max-width: 380px;">
+    <button class="btn btn-secondary" onclick="prevCard()">⬅️ Oldingisi</button>
+    <button class="btn btn-primary" onclick="nextCard()">Keyingisi ➡️</button>
+  </div>
+
+  <div class="modal" id="imageModal" onclick="closeModal()">
+    <img id="modalImg" src="" alt="Dori o'rami">
+  </div>
+
+  <script>
+    let drugs = [];
+    let currentIndex = 0;
+
+    async function fetchDrugs() {
+      try {
+        const res = await fetch('/api/drugs');
+        drugs = await res.json();
+        renderCard();
+      } catch (err) {
+        console.error("Xatolik:", err);
+      }
+    }
+
+    function renderCard() {
+      if (!drugs.length) return;
+      const drug = drugs[currentIndex];
+      const container = document.getElementById('cardContainer');
+
+      container.innerHTML = `
+        <div class="card">
+          <div>
+            <div class="badge ${drug.badge_type || 'primary'}">${drug.cluster}</div>
+            <div class="icon-box">${drug.icon}</div>
+            <div class="drug-title">${drug.name_trade}</div>
+            <div class="drug-latin">${drug.name_latin} (${drug.inn})</div>
+            
+            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form}</div>
+            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage}</div>
+            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism}</div>
+            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications}</div>
+            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects}</div>
+            
+            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic}</div>
+          </div>
+
+          <button class="btn btn-secondary" style="margin-top: 15px;" onclick="openModal('${drug.real_image_url}')">
+            📸 Real o'ram fotosini ko'rish
+          </button>
+        </div>
+      `;
+    }
+
+    function nextCard() {
+      if (currentIndex < drugs.length - 1) {
+        currentIndex++;
+        renderCard();
+      }
+    }
+
+    function prevCard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCard();
+      }
+    }
+
+    function openModal(url) {
+      document.getElementById('modalImg').src = url;
+      document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+
+    window.onload = fetchDrugs;
+  </script>
+</body>
+</html>
