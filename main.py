@@ -13,12 +13,13 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 DRUGS_FILE = "drugs_database.json"
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN_HERE")
+# === BOT SOZLAMALARI ===
+BOT_TOKEN = "9133605157:AAHfFAIxKGcezUawUqecLT2P8fr5zxsmkkE"
 CHANNEL_USERNAME = "@fundamedical_academy"
-WEB_APP_URL = os.getenv("WEB_APP_URL", "https://pharmaxotira-bot.onrender.com")
+WEB_APP_URL = "https://pharmaxotira-bot.onrender.com"
 
-# --- AIOGRAM BOT CONFIGURATION ---
-bot = Bot(token=BOT_TOKEN) if BOT_TOKEN and BOT_TOKEN != "YOUR_TELEGRAM_BOT_TOKEN_HERE" else None
+# --- AIOGRAM BOT SOZLAMALARI ---
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 router = Router()
 
@@ -56,7 +57,7 @@ async def start_handler(message: types.Message):
 
 dp.include_router(router)
 
-# --- FASTAPI LIFESPAN ---
+# --- FASTAPI LIFESPAN (Bot pollingni fonda ishga tushirish) ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if bot:
@@ -93,7 +94,7 @@ async def get_drugs():
 
 @app.get("/api/check-sub")
 async def check_subscription(user_id: int = Query(...)):
-    if not BOT_TOKEN or BOT_TOKEN == "YOUR_TELEGRAM_BOT_TOKEN_HERE":
+    if not BOT_TOKEN:
         return {"subscribed": True}
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getChatMember"
