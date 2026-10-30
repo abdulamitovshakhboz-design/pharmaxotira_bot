@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-# Static papkani ulash
+# Static papka tayyor bo'lsa ulash
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -30,16 +30,21 @@ def save_drugs(data):
         print(f"JSON saqlashda xatolik: {e}")
 
 async def search_wikimedia_image(drug_name: str, latin_name: str = "") -> str:
-    """Wikimedia Commons API orqali xavfsiz va xatosiz rasm qidirish"""
+    """
+    Wikimedia Commons API orqali dori qadog'i, ampulasi yoki flakoni rasmini qidiradi.
+    """
+    # Lotincha nomdan qavslarni va ortiqcha so'zlarni tozalaymiz
+    clean_latin = latin_name.split("(")[0].strip() if latin_name else ""
+    
     search_queries = [
-        f"{drug_name} pharmaceutical packaging",
+        f"{clean_latin} pharmaceutical packaging",
         f"{drug_name} medicine vial box",
-        f"{latin_name} injection ampoule",
-        f"{drug_name} drug box"
+        f"{clean_latin} injection ampoule",
+        f"{clean_latin} drug box"
     ]
     
     headers = {
-        "User-Agent": "PharmaXotiraBot/1.0 (educational app; contact@fundamedical.uz)"
+        "User-Agent": "PharmaXotiraBot/1.0 (educational medical app; contact@fundamedical.uz)"
     }
 
     try:
@@ -66,6 +71,7 @@ async def search_wikimedia_image(drug_name: str, latin_name: str = "") -> str:
                         mime = image_info.get("mime", "")
                         file_url = image_info.get("url", "")
                         
+                        # Faqat haqiqiy rasm formatlarini filtrlaymiz
                         if mime.startswith("image/") and file_url:
                             return file_url
     except Exception as e:
@@ -73,11 +79,12 @@ async def search_wikimedia_image(drug_name: str, latin_name: str = "") -> str:
     return ""
 
 async def background_update_images():
-    """Foydalanuvchini kutdirtmasdan fonda rasmlarni izlab bazaga kiritish"""
+    """Foydalanuvchi kutib qolmasligi uchun fonda rasmlarni izlab bazaga kiritish"""
     drugs = load_drugs()
     updated = False
     for drug in drugs:
         real_url = drug.get("real_image_url", "")
+        # Unsplash yoki bo'sh havolalarni Wikimedia orqali almashtiramiz
         if not real_url or "unsplash.com" in real_url or "via.placeholder" in real_url:
             found_url = await search_wikimedia_image(drug.get("name", ""), drug.get("latin_name", ""))
             if found_url:
@@ -97,6 +104,6 @@ async def read_app():
 @app.get("/api/drugs")
 async def get_drugs(background_tasks: BackgroundTasks):
     drugs = load_drugs()
-    # Foydalanuvchiga ma'lumotni darhol qaytaramiz, rasmlarni izlashni background'ga o'tkazamiz
+    # Ma'lumotlarni zudlik bilan qaytarib, rasmlarni yangilashni fon vazifasiga beramiz
     background_tasks.add_task(background_update_images)
     return drugs
