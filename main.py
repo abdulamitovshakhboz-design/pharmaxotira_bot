@@ -23,13 +23,13 @@ dp = Dispatcher()
 router = Router()
 
 START_TEXT = (
-    "👋 **PharmaXotira** botiga xush kelibsiz!\n\n"
-    "💊 Bu bot farmakologiya fanidan **\"Periferik asam sistemasiga ta'sir etuvchi dorilar\"** "
+    "👋 <b>PharmaXotira</b> botiga xush kelibsiz!\n\n"
+    "💊 Bu bot farmakologiya fanidan <b>\"Periferik asam sistemasiga ta'sir etuvchi dorilar\"</b> "
     "bo'limidagi 63 ta dori vositasini interaktiv flashcardlar va mnemonikalar orqali oson yodlashingizga yordam beradi.\n\n"
-    "📚 **Ma'lumotlar manbasi:**\n"
-    "Barcha dori dozalari va chiqarilish shakllari **\"Retseptura 2017\"** o'quv qo'llanmasi hamda "
+    "📚 <b>Ma'lumotlar manbasi:</b>\n"
+    "Barcha dori dozalari va chiqarilish shakllari <b>\"Retseptura 2017\"</b> o'quv qo'llanmasi hamda "
     "xalqaro tibbiy manbalar (Medscape, Drugs.com) asosida shakllantirilgan.\n\n"
-    "📥 **Taklif va murojaatlar uchun:**\n"
+    "📥 <b>Taklif va murojaatlar uchun:</b>\n"
     "Bot bo'yicha taklif va mulohazalaringiz bo'lsa, @Shakhbozbek_Abdulamitov ga murojaat qilishingiz mumkin.\n\n"
     "👇 Pastdagi tugma orqali Mini App'ni ochishingiz mumkin:"
 )
@@ -52,7 +52,7 @@ async def start_handler(message: types.Message):
             ]
         ]
     )
-    await message.answer(text=START_TEXT, reply_markup=keyboard, parse_mode="Markdown")
+    await message.answer(text=START_TEXT, reply_markup=keyboard, parse_mode="HTML")
 
 dp.include_router(router)
 
