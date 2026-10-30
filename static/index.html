@@ -158,7 +158,7 @@
   <div class="header">
     <h1>PharmaXotira</h1>
     <select id="clusterSelect" class="cluster-select" onchange="filterCluster()">
-      <option value="ALL">Барча бўлимлар (Ҳаммаси)</option>
+      <option value="ALL">Barcha bo'limlar (Hammasi)</option>
     </select>
   </div>
 
@@ -167,22 +167,25 @@
   </div>
 
   <div class="btn-group">
-    <button class="btn btn-secondary" onclick="prevCard()">⬅️ Олдингиси</button>
+    <button class="btn btn-secondary" onclick="prevCard()">⬅️ Oldingisi</button>
     <button class="btn btn-primary" onclick="nextCard()">Keyingisi ➡️</button>
   </div>
 
   <!-- Subscription Modal Lock -->
   <div class="modal" id="subModal">
     <div class="modal-content">
-      <h2>📢 Каналга аъзо бўлинг</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">
-        Давом этиш ва сифатли фармакологик ресурслардан фойдаланиш учун <b>@fundamedical_academy</b> каналига аъзо бўлинг!
+      <h2>📢 Kanallarga a'zo bo'ling</h2>
+      <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 15px;">
+        Davom etish uchun quyidagi kanallarning barchasiga a'zo bo'lishingiz kerak:
       </p>
-      <a href="https://t.me/fundamedical_academy" target="_blank" class="btn btn-primary" style="display: block; text-decoration: none; margin-bottom: 10px;">
-        👉 Каналга аъзо бўлиш
+      <a href="https://t.me/fundamedical_academy" target="_blank" class="btn btn-primary" style="display: block; text-decoration: none; margin-bottom: 8px;">
+        1️⃣ @fundamedical_academy
+      </a>
+      <a href="https://t.me/MedLife_Official" target="_blank" class="btn btn-primary" style="display: block; text-decoration: none; margin-bottom: 15px; background-color: #27ae60;">
+        2️⃣ @MedLife_Official
       </a>
       <button class="btn btn-secondary" style="width: 100%;" onclick="verifySub()">
-        ✅ Аъзо бўлдим (Текшириш)
+        ✅ A'zo bo'ldim (Tekshirish)
       </button>
     </div>
   </div>
@@ -204,7 +207,6 @@
         filteredDrugs = [...allDrugs];
         renderCard();
 
-        // 2-марта фойдаланишни ва канал аъзолигини текшириш
         checkSubAccess();
       } catch (err) {
         console.error("Xatolik:", err);
@@ -252,13 +254,13 @@
             <div class="drug-title">${drug.name || ''}</div>
             <div class="drug-latin">${drug.latin_name || ''}</div>
             
-            <div class="info-section"><span class="info-title">Чиқарилиш шакли:</span> ${drug.form || ''}</div>
-            <div class="info-section"><span class="info-title">Доза ва йўллари:</span> ${drug.dosage || ''}</div>
-            <div class="info-section"><span class="info-title">Таъсир механизми:</span> ${drug.mechanism || ''}</div>
-            <div class="info-section"><span class="info-title">Кўрсатмалар:</span> ${drug.indications || ''}</div>
-            <div class="info-section"><span class="info-title">Ножўя таъсири:</span> ${drug.side_effects || ''}</div>
+            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form || ''}</div>
+            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage || ''}</div>
+            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism || ''}</div>
+            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications || ''}</div>
+            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects || ''}</div>
             
-            <div class="mnemonic-box">💡 <b>Мнемоника:</b> ${drug.mnemonic || ''}</div>
+            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic || ''}</div>
           </div>
         </div>
       `;
@@ -282,12 +284,10 @@
       const hasUsedBefore = localStorage.getItem('pharmaxotira_used_once');
       
       if (!hasUsedBefore) {
-        // 1-марта фойдаланиш: бемалол ўтказиб юборамиз
         localStorage.setItem('pharmaxotira_used_once', 'true');
         return;
       }
 
-      // 2-марта ва ундан кейин аъзоликни текширамиз
       const userId = tg?.initDataUnsafe?.user?.id;
       if (userId) {
         try {
@@ -297,7 +297,7 @@
             document.getElementById('subModal').style.display = 'flex';
           }
         } catch (e) {
-          console.error("Аъзолик текширувида хатолик:", e);
+          console.error("A'zolik tekshiruvida xatolik:", e);
         }
       }
     }
@@ -305,13 +305,17 @@
     async function verifySub() {
       const userId = tg?.initDataUnsafe?.user?.id;
       if (userId) {
-        const res = await fetch(`/api/check-sub?user_id=${userId}`);
-        const data = await res.json();
-        if (data.subscribed) {
-          document.getElementById('subModal').style.display = 'none';
-          alert("Раҳмат! Аъзолик тасдиқланди.");
-        } else {
-          alert("Сиз ҳали @fundamedical_academy каналига аъзо бўлмадингиз.");
+        try {
+          const res = await fetch(`/api/check-sub?user_id=${userId}`);
+          const data = await res.json();
+          if (data.subscribed) {
+            document.getElementById('subModal').style.display = 'none';
+            alert("Rahmat! A'zolik tasdiqlandi.");
+          } else {
+            alert(`Siz hali ${data.channel || 'kanal'}ga a'zo bo'lmadingiz.`);
+          }
+        } catch (e) {
+          alert("Tekshirishda xatolik yuz berdi.");
         }
       } else {
         document.getElementById('subModal').style.display = 'none';
