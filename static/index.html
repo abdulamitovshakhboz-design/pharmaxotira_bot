@@ -24,22 +24,30 @@
     }
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      width: 100%;
+      max-width: 380px;
     }
     .header h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       margin: 0;
       color: #2c3e50;
     }
-    .header p {
+    .cluster-select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-weight: bold;
+      color: #334155;
       font-size: 0.85rem;
-      color: #7f8c8d;
-      margin-top: 5px;
     }
     .card-container {
       width: 100%;
       max-width: 380px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .card {
       width: 100%;
@@ -53,24 +61,33 @@
       flex-direction: column;
       justify-content: space-between;
     }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
     .badge {
-      align-self: flex-start;
       padding: 4px 10px;
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: bold;
       color: #fff;
       background-color: var(--primary-color);
-      margin-bottom: 10px;
+    }
+    .counter {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #64748b;
     }
     .icon-box {
-      font-size: 3.5rem;
+      font-size: 3rem;
       text-align: center;
       margin: 5px 0;
     }
     .drug-title {
       text-align: center;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: bold;
       margin: 5px 0;
     }
@@ -78,13 +95,13 @@
       text-align: center;
       font-style: italic;
       color: #7f8c8d;
-      font-size: 0.9rem;
-      margin-bottom: 15px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
     }
     .info-section {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.4;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .info-title {
       font-weight: bold;
@@ -95,13 +112,14 @@
       border-left: 4px solid #1abc9c;
       padding: 8px 12px;
       border-radius: 4px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       margin-top: 10px;
     }
     .btn-group {
       display: flex;
       gap: 10px;
-      margin-top: 15px;
+      width: 100%;
+      max-width: 380px;
     }
     .btn {
       flex: 1;
@@ -115,68 +133,139 @@
     }
     .btn-primary { background-color: #3498db; color: white; }
     .btn-secondary { background-color: #ecf0f1; color: #2c3e50; }
+
+    /* Modal Sub/Lock Window */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      max-width: 300px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <div class="header">
     <h1>PharmaXotira</h1>
-    <p>Interaktiv Farmakologiya Flashcardlari</p>
+    <select id="clusterSelect" class="cluster-select" onchange="filterCluster()">
+      <option value="ALL">Барча бўлимлар (Ҳаммаси)</option>
+    </select>
   </div>
 
   <div class="card-container" id="cardContainer">
-    <!-- Dynamic Content -->
+    <!-- Dynamic Card Content -->
   </div>
 
-  <div class="btn-group" style="width: 100%; max-width: 380px;">
-    <button class="btn btn-secondary" onclick="prevCard()">⬅️ Oldingisi</button>
+  <div class="btn-group">
+    <button class="btn btn-secondary" onclick="prevCard()">⬅️ Олдингиси</button>
     <button class="btn btn-primary" onclick="nextCard()">Keyingisi ➡️</button>
   </div>
 
+  <!-- Subscription Modal Lock -->
+  <div class="modal" id="subModal">
+    <div class="modal-content">
+      <h2>📢 Каналга аъзо бўлинг</h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">
+        Давом этиш ва сифатли фармакологик ресурслардан фойдаланиш учун <b>@fundamedical_academy</b> каналига аъзо бўлинг!
+      </p>
+      <a href="https://t.me/fundamedical_academy" target="_blank" class="btn btn-primary" style="display: block; text-decoration: none; margin-bottom: 10px;">
+        👉 Каналга аъзо бўлиш
+      </a>
+      <button class="btn btn-secondary" style="width: 100%;" onclick="verifySub()">
+        ✅ Аъзо бўлдим (Текшириш)
+      </button>
+    </div>
+  </div>
+
   <script>
-    let drugs = [];
+    const tg = window.Telegram?.WebApp;
+    tg?.expand();
+
+    let allDrugs = [];
+    let filteredDrugs = [];
     let currentIndex = 0;
 
-    async function fetchDrugs() {
+    async function initApp() {
       try {
         const res = await fetch('/api/drugs');
-        drugs = await res.json();
+        allDrugs = await res.json();
+        
+        populateClusters();
+        filteredDrugs = [...allDrugs];
         renderCard();
+
+        // 2-марта фойдаланишни ва канал аъзолигини текшириш
+        checkSubAccess();
       } catch (err) {
         console.error("Xatolik:", err);
       }
     }
 
-    function renderCard() {
-      if (!drugs.length) return;
-      const drug = drugs[currentIndex];
-      const container = document.getElementById('cardContainer');
+    function populateClusters() {
+      const select = document.getElementById('clusterSelect');
+      const clusters = [...new Set(allDrugs.map(d => d.cluster))];
+      
+      clusters.forEach(c => {
+        if (c) {
+          const opt = document.createElement('option');
+          opt.value = c;
+          opt.innerText = c;
+          select.appendChild(opt);
+        }
+      });
+    }
 
-      const tradeName = drug.name || drug.name_trade || drug.id;
-      const latinName = drug.latin_name || drug.latin || '';
+    function filterCluster() {
+      const selected = document.getElementById('clusterSelect').value;
+      if (selected === 'ALL') {
+        filteredDrugs = [...allDrugs];
+      } else {
+        filteredDrugs = allDrugs.filter(d => d.cluster === selected);
+      }
+      currentIndex = 0;
+      renderCard();
+    }
+
+    function renderCard() {
+      if (!filteredDrugs.length) return;
+      const drug = filteredDrugs[currentIndex];
+      const container = document.getElementById('cardContainer');
 
       container.innerHTML = `
         <div class="card">
           <div>
-            <div class="badge">${drug.cluster || ''}</div>
+            <div class="card-header">
+              <span class="badge">${drug.cluster || ''}</span>
+              <span class="counter">${currentIndex + 1} / ${filteredDrugs.length}</span>
+            </div>
             <div class="icon-box">${drug.icon || '💊'}</div>
-            <div class="drug-title">${tradeName}</div>
-            <div class="drug-latin">${latinName}</div>
+            <div class="drug-title">${drug.name || ''}</div>
+            <div class="drug-latin">${drug.latin_name || ''}</div>
             
-            <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form || ''}</div>
-            <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage || ''}</div>
-            <div class="info-section"><span class="info-title">Ta'sir mexanizmi:</span> ${drug.mechanism || ''}</div>
-            <div class="info-section"><span class="info-title">Ko'rsatmalar:</span> ${drug.indications || ''}</div>
-            <div class="info-section"><span class="info-title">Nojo'ya ta'siri:</span> ${drug.side_effects || ''}</div>
+            <div class="info-section"><span class="info-title">Чиқарилиш шакли:</span> ${drug.form || ''}</div>
+            <div class="info-section"><span class="info-title">Доза ва йўллари:</span> ${drug.dosage || ''}</div>
+            <div class="info-section"><span class="info-title">Таъсир механизми:</span> ${drug.mechanism || ''}</div>
+            <div class="info-section"><span class="info-title">Кўрсатмалар:</span> ${drug.indications || ''}</div>
+            <div class="info-section"><span class="info-title">Ножўя таъсири:</span> ${drug.side_effects || ''}</div>
             
-            <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic || ''}</div>
+            <div class="mnemonic-box">💡 <b>Мнемоника:</b> ${drug.mnemonic || ''}</div>
           </div>
         </div>
       `;
     }
 
     function nextCard() {
-      if (currentIndex < drugs.length - 1) {
+      if (currentIndex < filteredDrugs.length - 1) {
         currentIndex++;
         renderCard();
       }
@@ -189,7 +278,47 @@
       }
     }
 
-    window.onload = fetchDrugs;
+    async function checkSubAccess() {
+      const hasUsedBefore = localStorage.getItem('pharmaxotira_used_once');
+      
+      if (!hasUsedBefore) {
+        // 1-марта фойдаланиш: бемалол ўтказиб юборамиз
+        localStorage.setItem('pharmaxotira_used_once', 'true');
+        return;
+      }
+
+      // 2-марта ва ундан кейин аъзоликни текширамиз
+      const userId = tg?.initDataUnsafe?.user?.id;
+      if (userId) {
+        try {
+          const res = await fetch(`/api/check-sub?user_id=${userId}`);
+          const data = await res.json();
+          if (!data.subscribed) {
+            document.getElementById('subModal').style.display = 'flex';
+          }
+        } catch (e) {
+          console.error("Аъзолик текширувида хатолик:", e);
+        }
+      }
+    }
+
+    async function verifySub() {
+      const userId = tg?.initDataUnsafe?.user?.id;
+      if (userId) {
+        const res = await fetch(`/api/check-sub?user_id=${userId}`);
+        const data = await res.json();
+        if (data.subscribed) {
+          document.getElementById('subModal').style.display = 'none';
+          alert("Раҳмат! Аъзолик тасдиқланди.");
+        } else {
+          alert("Сиз ҳали @fundamedical_academy каналига аъзо бўлмадингиз.");
+        }
+      } else {
+        document.getElementById('subModal').style.display = 'none';
+      }
+    }
+
+    window.onload = initApp;
   </script>
 </body>
 </html>
