@@ -11,7 +11,6 @@
       --card-bg: #ffffff;
       --text-color: #2c3e50;
       --primary-color: #3498db;
-      --accent-color: #e74c3c;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -40,12 +39,11 @@
     .card-container {
       width: 100%;
       max-width: 380px;
-      perspective: 1000px;
       margin-bottom: 20px;
     }
     .card {
       width: 100%;
-      min-height: 420px;
+      min-height: 380px;
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -54,9 +52,6 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
-      position: relative;
     }
     .badge {
       align-self: flex-start;
@@ -68,14 +63,10 @@
       background-color: var(--primary-color);
       margin-bottom: 10px;
     }
-    .badge.danger { background-color: #e74c3c; }
-    .badge.warning { background-color: #f39c12; }
-    .badge.success { background-color: #2ecc71; }
-
     .icon-box {
-      font-size: 4rem;
+      font-size: 3.5rem;
       text-align: center;
-      margin: 10px 0;
+      margin: 5px 0;
     }
     .drug-title {
       text-align: center;
@@ -124,23 +115,6 @@
     }
     .btn-primary { background-color: #3498db; color: white; }
     .btn-secondary { background-color: #ecf0f1; color: #2c3e50; }
-
-    /* Modal Image CSS */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    .modal img {
-      max-width: 90%;
-      max-height: 80%;
-      border-radius: 12px;
-      object-fit: contain;
-    }
   </style>
 </head>
 <body>
@@ -157,10 +131,6 @@
   <div class="btn-group" style="width: 100%; max-width: 380px;">
     <button class="btn btn-secondary" onclick="prevCard()">⬅️ Oldingisi</button>
     <button class="btn btn-primary" onclick="nextCard()">Keyingisi ➡️</button>
-  </div>
-
-  <div class="modal" id="imageModal" onclick="closeModal()">
-    <img id="modalImg" src="" alt="Dori o'rami">
   </div>
 
   <script>
@@ -182,18 +152,16 @@
       const drug = drugs[currentIndex];
       const container = document.getElementById('cardContainer');
 
-      // JSON faylingizdagi turli nomlarga moslashuvchan mantiq:
-      const tradeName = drug.name_trade || drug.name || drug.id;
-      const latinName = drug.name_latin || drug.latin || '';
-      const innText = drug.inn ? ` (${drug.inn})` : '';
+      const tradeName = drug.name || drug.name_trade || drug.id;
+      const latinName = drug.latin_name || drug.latin || '';
 
       container.innerHTML = `
         <div class="card">
           <div>
-            <div class="badge ${drug.badge_type || 'primary'}">${drug.cluster || ''}</div>
+            <div class="badge">${drug.cluster || ''}</div>
             <div class="icon-box">${drug.icon || '💊'}</div>
             <div class="drug-title">${tradeName}</div>
-            <div class="drug-latin">${latinName}${innText}</div>
+            <div class="drug-latin">${latinName}</div>
             
             <div class="info-section"><span class="info-title">Chiqarilish shakli:</span> ${drug.form || ''}</div>
             <div class="info-section"><span class="info-title">Doza va yo'llari:</span> ${drug.dosage || ''}</div>
@@ -203,10 +171,6 @@
             
             <div class="mnemonic-box">💡 <b>Mnemonika:</b> ${drug.mnemonic || ''}</div>
           </div>
-
-          <button class="btn btn-secondary" style="margin-top: 15px;" onclick="openModal('${drug.real_image_url || drug.image_url || ''}')">
-            📸 Real o'ram fotosini ko'rish
-          </button>
         </div>
       `;
     }
@@ -223,22 +187,6 @@
         currentIndex--;
         renderCard();
       }
-    }
-
-    function openModal(url) {
-      const img = document.getElementById('modalImg');
-      
-      // Rasm yuklanmay qolsa placeholder rasm ko'rsatadi
-      img.onerror = function() {
-        this.src = 'https://via.placeholder.com/350x250?text=Karobka+Fotosi+Mavjud+Emas';
-      };
-
-      img.src = url && url.startsWith('http') ? url : 'https://via.placeholder.com/350x250?text=Karobka+Fotosi+Mavjud+Emas';
-      document.getElementById('imageModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('imageModal').style.display = 'none';
     }
 
     window.onload = fetchDrugs;
