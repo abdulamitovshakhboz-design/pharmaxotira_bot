@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -223,8 +222,6 @@
       margin: 13px 0 17px;
     }
 
-    /* MA'LUMOTLAR BO'LIMLARI */
-
     .info-section {
       margin-bottom: 21px;
       font-size: 0.85rem;
@@ -232,8 +229,6 @@
       color: #39465a;
       overflow-wrap: anywhere;
     }
-
-    /* BO'LIM SARLAVHASI */
 
     .info-title {
       display: flex;
@@ -250,8 +245,6 @@
       line-height: 1.4;
     }
 
-    /* RAQAM BELGISI */
-
     .section-number {
       flex: 0 0 25px;
       width: 25px;
@@ -264,8 +257,6 @@
       font-size: 0.72rem;
       font-weight: 800;
     }
-
-    /* HAR BIR MA'LUMOT ALOHIDA KARTOCHKADA */
 
     .info-list {
       list-style: none;
@@ -326,6 +317,148 @@
       object-fit: contain;
       margin: 0 auto 15px;
       border-radius: 10px;
+    }
+
+    /* RETSEPT TUGMASI */
+
+    .prescription-button {
+      display: block;
+      width: 100%;
+      min-height: 47px;
+      margin-top: 20px;
+      padding: 12px 15px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .prescription-button:active,
+    .return-button:active {
+      transform: scale(0.98);
+    }
+
+    /* RETSEPTNING ORQA TOMONI */
+
+    .prescription-view {
+      animation: appear 0.25s ease;
+    }
+
+    .prescription-heading {
+      text-align: center;
+      margin: 8px 0 20px;
+    }
+
+    .prescription-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 12px;
+      display: grid;
+      place-items: center;
+      border-radius: 17px;
+      background: var(--primary-light);
+      font-size: 28px;
+    }
+
+    .prescription-heading h2 {
+      margin: 0 0 6px;
+      color: #172033;
+      font-size: 1.25rem;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .prescription-subtitle {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .prescription-meta {
+      padding: 13px 14px;
+      margin-bottom: 16px;
+      background: #f4f8fd;
+      border: 1px solid #e5edf7;
+      border-radius: 11px;
+    }
+
+    .prescription-meta-label {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .prescription-meta-value {
+      color: #26364a;
+      font-size: 0.88rem;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .prescription-paper {
+      padding: 17px 15px;
+      margin: 15px 0 20px;
+      background: #fffefa;
+      border: 1px solid #e9e4d7;
+      border-radius: 11px;
+      box-shadow: 0 3px 12px rgba(50, 45, 30, 0.04);
+    }
+
+    .prescription-paper-title {
+      color: #7c8797;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 13px;
+    }
+
+    .prescription-latin {
+      margin: 0;
+      color: #243247;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.85;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .prescription-note {
+      margin-top: 18px;
+      padding: 12px 13px;
+      background: #f4f8fd;
+      border-radius: 10px;
+      color: #53657b;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .prescription-note strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #34465d;
+    }
+
+    .return-button {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      margin-top: 20px;
+      padding: 11px 14px;
+      border: 0;
+      border-radius: 12px;
+      background: #e8edf4;
+      color: #344256;
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s;
     }
 
     .btn-group {
@@ -452,6 +585,7 @@
       .card { padding: 17px 14px; }
       .drug-title { font-size: 1.2rem; }
       .info-section, .mnemonic-box { font-size: 0.81rem; }
+      .prescription-latin { font-size: 0.81rem; }
     }
   </style>
 </head>
@@ -561,6 +695,9 @@
   let filteredDrugs = [];
   let currentIndex = 0;
 
+  // Kartochkaning qaysi tomoni ochiqligini saqlaydi.
+  let showingPrescription = false;
+
   const cardContainer = document.getElementById("cardContainer");
   const searchInput = document.getElementById("searchInput");
   const clusterSelect = document.getElementById("clusterSelect");
@@ -614,6 +751,7 @@
       populateClusters();
       filteredDrugs = [...allDrugs];
       currentIndex = 0;
+      showingPrescription = false;
 
       renderCard();
       checkSubAccess();
@@ -694,6 +832,7 @@
     });
 
     currentIndex = 0;
+    showingPrescription = false;
     renderCard();
   }
 
@@ -705,9 +844,6 @@
     •  — punkt
     |  — vertikal chiziq
     \n — yangi qator
-
-    Agar matnda ajratish belgisi bo'lmasa,
-    u bitta alohida punkt bo'lib qoladi.
   */
 
   function splitIntoItems(value) {
@@ -720,18 +856,10 @@
 
     if (!text) return [];
 
-    let items = text
+    return text
       .split(/\n|;|•|\s+\|\s+/)
       .map(item => item.trim())
       .filter(item => item.length > 0);
-
-    /*
-      Nuqta bilan yozilgan alohida gaplarni
-      avtomatik ajratmaymiz. Chunki dori nomlari,
-      foizlar va qisqartmalar buzilib ketishi mumkin.
-    */
-
-    return items;
   }
 
   function createInfoSection(number, title, content) {
@@ -757,8 +885,114 @@
     `;
   }
 
+  // RETSEPT TOMONINI OCHISH
+
+  function showPrescription() {
+    const drug = filteredDrugs[currentIndex];
+
+    if (!drug || !drug.prescription) return;
+
+    showingPrescription = true;
+    renderCard();
+  }
+
+  // DORI MA'LUMOTLARI TOMONIGA QAYTISH
+
+  function showDrugInfo() {
+    showingPrescription = false;
+    renderCard();
+  }
+
+  // RETSEPT TOMONINI CHIZISH
+
+  function renderPrescriptionCard(drug) {
+    const prescription = drug.prescription || {};
+
+    const commercialName = escapeHTML(
+      prescription.commercial_name || getDrugName(drug)
+    );
+
+    const form = escapeHTML(prescription.form || "Ko‘rsatilmagan");
+
+    const latinText = escapeHTML(prescription.latin || "");
+
+    const explanationHTML = prescription.explanation
+      ? createInfoSection(
+          1,
+          "Retsept qismlarining izohi",
+          prescription.explanation
+        )
+      : "";
+
+    const noteHTML = prescription.note
+      ? `
+        <div class="prescription-note">
+          <strong>📌 Eslatma</strong>
+          ${escapeHTML(prescription.note)}
+        </div>
+      `
+      : "";
+
+    cardContainer.innerHTML = `
+      <article class="card prescription-view">
+
+        <div class="card-header">
+          <span class="badge">📝 RETSEPT</span>
+          <span class="counter">
+            ${currentIndex + 1} / ${filteredDrugs.length}
+          </span>
+        </div>
+
+        <div class="prescription-heading">
+          <div class="prescription-icon">📜</div>
+
+          <h2>${commercialName}</h2>
+
+          <div class="prescription-subtitle">
+            Dori vositasining retsept namunasi
+          </div>
+        </div>
+
+        <div class="prescription-meta">
+          <div class="prescription-meta-label">
+            DORI SHAKLI
+          </div>
+
+          <div class="prescription-meta-value">
+            ${form}
+          </div>
+        </div>
+
+        <div class="prescription-paper">
+          <div class="prescription-paper-title">
+            Retseptning lotincha yozilishi
+          </div>
+
+          <pre class="prescription-latin">${latinText || "Retsept kiritilmagan."}</pre>
+        </div>
+
+        ${explanationHTML}
+
+        ${noteHTML}
+
+        <button
+          class="return-button"
+          onclick="showDrugInfo()"
+        >
+          ⬅️ Dori ma’lumotlariga qaytish
+        </button>
+
+      </article>
+    `;
+
+    updateProgress();
+    updateNavigation();
+  }
+
   function renderCard() {
     if (!filteredDrugs.length) {
+      showingPrescription = false;
+
       cardContainer.innerHTML = `
         <div class="state-card">
           <div class="state-icon">🔍</div>
@@ -779,6 +1013,15 @@
     }
 
     const drug = filteredDrugs[currentIndex];
+
+    // Agar retsept tomoni tanlangan bo‘lsa, uni ko‘rsatamiz.
+    if (showingPrescription && drug.prescription) {
+      renderPrescriptionCard(drug);
+      return;
+    }
+
+    // Agar retsept ma'lumoti mavjud bo‘lmasa, old tomonni ko‘rsatamiz.
+    showingPrescription = false;
 
     const name = escapeHTML(getDrugName(drug));
     const latin = escapeHTML(getLatinName(drug));
@@ -804,6 +1047,18 @@
         >
       `;
     }
+
+    // Faqat retsept maydoni mavjud bo‘lgan dorilarda tugma chiqadi.
+    const prescriptionButtonHTML = drug.prescription
+      ? `
+        <button
+          class="prescription-button"
+          onclick="showPrescription()"
+        >
+          📝 Retseptni ko‘rish
+        </button>
+      `
+      : "";
 
     cardContainer.innerHTML = `
       <article class="card">
@@ -844,6 +1099,8 @@
           </div>
         ` : ""}
 
+        ${prescriptionButtonHTML}
+
       </article>
     `;
 
@@ -875,6 +1132,7 @@
   function nextCard() {
     if (currentIndex < filteredDrugs.length - 1) {
       currentIndex++;
+      showingPrescription = false;
       renderCard();
     }
   }
@@ -882,6 +1140,7 @@
   function prevCard() {
     if (currentIndex > 0) {
       currentIndex--;
+      showingPrescription = false;
       renderCard();
     }
   }
