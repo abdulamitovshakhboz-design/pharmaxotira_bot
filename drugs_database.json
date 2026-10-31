@@ -1,5 +1,5 @@
-[
-  {
+
+ {
     "id": "dikain",
     "cluster": "I-KLASTER: MAHALLIY ANESTETIKLAR",
     "icon": "👁️",
@@ -8,9 +8,16 @@
     "form": "Kukun; 0,3% li eritma 5 va 10 ml flakonda (ko'z tomchisi); ko'z plyonkasi 0,00075 g.",
     "dosage": "0,25%-2% li eritma 1-2 tomchi kon'yunktiva bo'shlig'iga; LORda 0,5%-1% li eritma 3 ml gacha yuzaki.",
     "mechanism": "Efir hosilasi, juda yuqori toksiklikka va kuchli yuzaki anesteziyalovchi ta'sirga ega.",
-    "indications": "Oftalmologiya (shoh parda operatsiyalari, glaukoma) va LOR amaliyotida yuzaki anesteziya.",
+    "indications": "Oftalmologiya va LOR amaliyotida yuzaki anesteziya.",
     "side_effects": "Yuqori toksiklik, ko'z ichi bosimini oshirishi, shoh parda epiteliysini shikastlashi.",
-    "mnemonic": "DIKAIN = Dik (kuchli) va xavfli anestetik (faqat yuzaki ishlatiladi)."
+    "mnemonic": "DIKAIN = Dik (kuchli) va xavfli anestetik (faqat yuzaki ishlatiladi).",
+    "prescription": {
+      "commercial_name": "DIKAIN",
+      "form": "Ko'z tomchisi",
+      "latin": "Rp.: Sol. Tetracaini 0,5% — 5 ml\nD.S. Ko'z yuzasini mahalliy anesteziya qilish uchun.",
+      "explanation": "Sol. — eritma; D.S. — berilsin va qo'llash usuli ko'rsatilsin.",
+      "note": "O'quv maqsadidagi retsept namunasi."
+    }
   },
   {
     "id": "anestezin",
@@ -21,9 +28,16 @@
     "form": "Kukun; 0,3 g tabletka; 5% li surtma.",
     "dosage": "Kattalarga: 0,3 g ichishga 3-4 mahal; 0,05-0,1 g to'g'ri ichakka; 5% surtma sirtga.",
     "mechanism": "Suvda yomon eriydigan efir anestetigi, faqat yuzaki ta'sir ko'rsatadi.",
-    "indications": "Me'da og'riqlari (gastrit, yara), gemorroy, teri qichishishi va kuyishlar.",
+    "indications": "Me'da og'riqlari, gemorroy, teri qichishishi va kuyishlar.",
     "side_effects": "Metgemoglobinemiya, mahalliy allergik dermatit.",
-    "mnemonic": "ANESTEZIN = A'zolar yuzasiga (me'da/teri) (suvda erimaydi)."
+    "mnemonic": "ANESTEZIN = A'zolar yuzasiga (me'da/teri) (suvda erimaydi).",
+    "prescription": {
+      "commercial_name": "ANESTEZIN",
+      "form": "Surtma",
+      "latin": "Rp.: Unguenti Benzocaini 5% — 20,0\nD.S. Mahalliy qo'llash uchun.",
+      "explanation": "Unguenti — surtma; D.S. — berilsin va qo'llash usuli ko'rsatilsin.",
+      "note": "O'quv maqsadidagi retsept namunasi."
+    }
   },
   {
     "id": "novokain",
@@ -35,8 +49,15 @@
     "dosage": "Infiltratsion (0,25%-0,5%), o'tkazuvchi (1%-2%), spinal (5%). Ichishga 0,1-0,2 g 2-3 mahal.",
     "mechanism": "Mo'tadil anesteziyalovchi, tomirlarni kengaytiruvchi va spazmolitik efir anestetigi.",
     "indications": "Infiltratsion va o'tkazuvchi anesteziya, Vishnevskiy blokadalari, spazmlar.",
-    "side_effects": "Allergik reaksiyalar (tez-tez), gipotenziya, bosh aylanishi.",
-    "mnemonic": "NOVOKAIN = Nisbatan eski va Nozik (allergen) blokadalar qiroli."
+    "side_effects": "Allergik reaksiyalar, gipotenziya, bosh aylanishi.",
+    "mnemonic": "NOVOKAIN = Nisbatan eski va Nozik (allergen) blokadalar qiroli.",
+    "prescription": {
+      "commercial_name": "NOVOKAIN",
+      "form": "In'eksiya eritmasi",
+      "latin": "Rp.: Sol. Procaini hydrochloridi 0,5% — 5 ml\nD.t.d. N. 10 in ampullis.\nS. Mahalliy anesteziya uchun.",
+      "explanation": "Sol. — eritma; D.t.d. N. 10 — shunday dozadan 10 ta berilsin; in ampullis — ampulalarda; S. — qo'llash usuli.",
+      "note": "O'quv maqsadidagi retsept namunasi."
+    }
   },
   {
     "id": "lidokain",
@@ -49,7 +70,14 @@
     "mechanism": "Amid anestetigi va Ib sinf antiaritmik moddasi.",
     "indications": "Anesteziyaning barcha turlari, qorinchalar aritmiyasini davolash.",
     "side_effects": "Uyquchilik, paresteziya, paroksizmal tortishishlar, bradikardiya.",
-    "mnemonic": "LIDOKAIN = Lider (universal anestetik + antiaritmik)."
+    "mnemonic": "LIDOKAIN = Lider (universal anestetik + antiaritmik).",
+    "prescription": {
+      "commercial_name": "LIDOKAIN",
+      "form": "In'eksiya eritmasi",
+      "latin": "Rp.: Sol. Lidocaini hydrochloridi 2% — 2 ml\nD.t.d. N. 10 in ampullis.\nS. Mahalliy anesteziya uchun.",
+      "explanation": "Sol. — eritma; D.t.d. N. 10 — shunday dozadan 10 ta berilsin; in ampullis — ampulalarda; S. — qo'llash usuli.",
+      "note": "O'quv maqsadidagi retsept namunasi."
+    }
   },
   {
     "id": "bupivakain",
@@ -62,8 +90,15 @@
     "mechanism": "Juda kuchli va uzoq (2-3 barobar) ta'sir qiluvchi amid anestetigi.",
     "indications": "Uzoq jarrohlik amaliyotlari, epidural va spinal anesteziya, tug'ruqni og'riqsizlantirish.",
     "side_effects": "Kardiotoksiklik (aritmiya, miokard depressiyasi), gipotenziya.",
-    "mnemonic": "BUPIVAKAIN = Buyuk (uzoq) muddatli anestetik."
-  },
+    "mnemonic": "BUPIVAKAIN = Buyuk (uzoq) muddatli anestetik.",
+    "prescription": {
+      "commercial_name": "BUPIVAKAIN",
+      "form": "In'eksiya eritmasi",
+      "latin": "Rp.: Sol. Bupivacaini hydrochloridi 0,5% — 4 ml\nD.t.d. N. 5 in ampullis.\nS. Mahalliy anesteziya uchun.",
+      "explanation": "Sol. — eritma; D.t.d. N. 5 — shunday dozadan 5 ta berilsin; in ampullis — ampulalarda; S. — qo'llash usuli.",
+      "note": "O'quv maqsadidagi retsept namunasi."
+    }
+  }
   {
     "id": "tanin",
     "cluster": "II-KLASTER: BURISHTIRUVCHI VA O'RAB OLUVCHI MODDALAR",
