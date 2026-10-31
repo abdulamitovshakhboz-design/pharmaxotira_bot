@@ -1,5 +1,5 @@
-
- {
+[
+  {
     "id": "dikain",
     "cluster": "I-KLASTER: MAHALLIY ANESTETIKLAR",
     "icon": "👁️",
@@ -98,7 +98,7 @@
       "explanation": "Sol. — eritma; D.t.d. N. 5 — shunday dozadan 5 ta berilsin; in ampullis — ampulalarda; S. — qo'llash usuli.",
       "note": "O'quv maqsadidagi retsept namunasi."
     }
-  }
+  },
   {
     "id": "tanin",
     "cluster": "II-KLASTER: BURISHTIRUVCHI VA O'RAB OLUVCHI MODDALAR",
