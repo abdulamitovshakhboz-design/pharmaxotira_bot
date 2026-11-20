@@ -753,6 +753,13 @@
         throw new Error("Dori ma'lumotlari noto'g'ri formatda.");
       }
 
+      if (tg?.initData) {
+        fetch("/api/visit", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({init_data: tg.initData})
+        }).catch(() => {});
+      }
       allDrugs = data;
       populateClusters();
       filteredDrugs = [...allDrugs];
