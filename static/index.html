@@ -75,6 +75,13 @@
       margin: 4px 0 16px;
     }
 
+    .source-note {
+      color: var(--muted);
+      font-size: 0.77rem;
+      line-height: 1.45;
+      margin: 9px 2px 0;
+    }
+
     .search-wrap { position: relative; width: 100%; }
 
     .search-icon {
@@ -722,6 +729,14 @@
       : cluster;
   }
 
+  function normalizeSearch(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/[‘’ʼʻ'`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   async function initApp() {
     showLoading();
 
@@ -787,8 +802,6 @@
       ...new Set(allDrugs.map(drug => drug.cluster).filter(Boolean))
     ];
 
-    clusters.sort((a, b) => String(a).localeCompare(String(b)));
-
     clusters.forEach(cluster => {
       const option = document.createElement("option");
       option.value = cluster;
@@ -799,7 +812,7 @@
 
   function filterDrugs() {
     const selectedCluster = clusterSelect.value;
-    const searchText = searchInput.value.toLowerCase().trim();
+    const searchText = normalizeSearch(searchInput.value);
 
     filteredDrugs = allDrugs.filter(drug => {
       const matchesCluster =
@@ -808,6 +821,7 @@
 
       const searchableText = [
         drug.name,
+        drug.source_name,
         drug.latin_name,
         drug.latin,
         drug.cluster,
@@ -817,9 +831,9 @@
         drug.indications,
         drug.side_effects,
         drug.mnemonic
-      ].filter(Boolean).join(" ").toLowerCase();
+      ].filter(Boolean).join(" ");
 
-      return matchesCluster && searchableText.includes(searchText);
+      return matchesCluster && normalizeSearch(searchableText).includes(searchText);
     });
 
     currentIndex = 0;
@@ -1056,6 +1070,7 @@
 
         ${createInfoSection(1, "Dori shakllari", drug.form)}
         ${createInfoSection(2, "Qo‘llash usuli va dozalari", drug.dosage)}
+        ${drug.source_name ? `<p class="source-note">Shakl va dozalar yuklangan retseptura kitobidan olingan o‘quv ma’lumotidir. Amaliy qo‘llashda amaldagi yo‘riqnoma tekshiriladi.</p>` : ""}
         ${createInfoSection(3, "Ta’sir mexanizmi", drug.mechanism)}
         ${createInfoSection(4, "Qo‘llanilishi", drug.indications)}
         ${createInfoSection(5, "Nojo‘ya ta’sirlari", drug.side_effects)}
