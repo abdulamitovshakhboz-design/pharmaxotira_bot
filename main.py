@@ -38,11 +38,12 @@ def load_drugs():
 
 START_TEXT = (
     "👋 <b>PharmaXotira</b> botiga xush kelibsiz!\n\n"
-    "💊 Bu bot farmakologiya fanidan <b>\"Periferik asab sistemasiga ta'sir etuvchi dorilar\"</b> "
-    "bo'limidagi 63 ta dori vositasini interaktiv flashcardlar va mnemonikalar orqali oson yodlashingizga yordam beradi.\n\n"
+    "💊 Bu bot farmakologiya fanidan periferik asab sistemasi, markaziy nerv sistemasi "
+    "va nafas olish organlariga ta'sir etuvchi <b>166 ta dori kartochkasini</b> "
+    "bo'limlar va qidiruv orqali o'rganishga yordam beradi.\n\n"
     "📚 <b>Ma'lumotlar manbasi:</b>\n"
-    "Barcha dori dozalari va chiqarilish shakllari <b>\"Retseptura 2017\"</b> o'quv qo'llanmasi hamda "
-    "xalqaro tibbiy manbalar (Medscape, Drugs.com) asosida shakllantirilgan.\n\n"
+    "Yangi kartochkalardagi dori shakllari va dozalar yuklangan retseptura qo'llanmasidan olingan. "
+    "Kartochkalar o'quv maqsadida tuzilgan; amaliy qo'llashdan oldin amaldagi yo'riqnomani tekshiring.\n\n"
     "📥 <b>Taklif va murojaatlar uchun:</b>\n"
     "Bot bo'yicha taklif va mulohazalaringiz bo'lsa, @Shakhbozbek_Abdulamitov ga murojaat qilishingiz mumkin.\n\n"
     "👇 Pastdagi tugma orqali Mini App'ni ochishingiz mumkin:"
