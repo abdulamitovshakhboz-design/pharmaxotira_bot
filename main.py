@@ -2,7 +2,11 @@ import os
 import json
 import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
+from pydantic import BaseModel
+from datetime import datetime, timezone
+from aiogram.utils.web_app import safe_parse_webapp_init_data
+import admin_features
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -69,11 +73,14 @@ async def start_handler(message: types.Message):
     )
     await message.answer(text=START_TEXT, reply_markup=keyboard, parse_mode="HTML")
 
+dp.message.outer_middleware(admin_features.TrackPrivateMessages())
+dp.include_router(admin_features.router)
 dp.include_router(router)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_drugs()
+    await admin_features.init_storage()
     
     polling_task = None
     if bot:
@@ -82,9 +89,11 @@ async def lifespan(app: FastAPI):
     
     yield
     
+    await admin_features.shutdown()
     if bot:
         if polling_task:
             polling_task.cancel()
+            await asyncio.gather(polling_task, return_exceptions=True)
         await bot.session.close()
 
 app = FastAPI(lifespan=lifespan)
@@ -119,3 +128,24 @@ async def check_subscription(user_id: int = Query(...)):
             return {"subscribed": False, "channel": channel}
 
     return {"subscribed": True}
+
+
+class AppVisit(BaseModel):
+    init_data: str
+
+@app.post("/api/visit")
+async def app_visit(visit: AppVisit):
+    if not BOT_TOKEN:
+        raise HTTPException(status_code=503, detail="Bot sozlanmagan")
+    try:
+        parsed = safe_parse_webapp_init_data(BOT_TOKEN, visit.init_data)
+        age = (datetime.now(timezone.utc) - parsed.auth_date).total_seconds()
+        if not parsed.user or not 0 <= age <= 86400:
+            raise ValueError("Expired")
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=401, detail="Telegram tasdiqlashi kerak")
+    try:
+        await admin_features.remember(parsed.user.id, app=True)
+    except Exception:
+        raise HTTPException(status_code=503, detail="Hisob vaqtincha ishlamayapti")
+    return {"ok": True}
